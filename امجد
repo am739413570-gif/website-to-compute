@@ -1,0 +1,90 @@
+// استيراد useState من React للتحكم في الحالة (State) import { useState } from "react";
+
+// استيراد مكونات جاهزة للواجهة (بطاقات وأزرار) import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button";
+
+// استيراد أيقونات (تشغيل – وغيرها) import { Play } from "lucide-react";
+
+// المكون الرئيسي للتطبيق export default function AnimeMakerApp() { // حالة لتخزين جميع المجسمات (شخصيات – سيارات – طائرات) const [objects, setObjects] = useState([]);
+
+// حالة لتخزين ID المجسم المحدد حاليًا const [selected, setSelected] = useState(null);
+
+// دالة لإضافة مجسم جديد إلى المشهد const addObject = (type) => { // نستخدم setObjects لإضافة عنصر جديد مع الحفاظ على العناصر السابقة setObjects([ ...objects, { id: Date.now(), // ID فريد بناءً على الوقت type,           // نوع المجسم (شخص – سيارة – طائرة) x: 50,           // الموقع الأفقي الافتراضي y: 50,           // الموقع العمودي الافتراضي action: "واقف", // الحالة الافتراضية للمجسم }, ]); };
+
+// دالة لتحديث حركة / حالة مجسم معين const updateAction = (id, action) => { // نقوم بعمل map على جميع المجسمات // وإذا تطابق الـ id نغير الحركة فقط setObjects( objects.map((o) => o.id === id ? { ...o, action } : o ) ); };
+
+// واجهة المستخدم return ( <div className="p-6 grid grid-cols-4 gap-4">
+
+{/* لوحة الأدوات: إضافة مجسمات */}
+  <Card className="col-span-1">
+    <CardContent className="space-y-3">
+      <h2 className="text-xl font-bold">➕ إضافة</h2>
+
+      {/* زر إضافة شخصية */}
+      <Button onClick={() => addObject("شخص")}>شخصية</Button>
+
+      {/* زر إضافة سيارة */}
+      <Button onClick={() => addObject("سيارة")}>سيارة</Button>
+
+      {/* زر إضافة طائرة */}
+      <Button onClick={() => addObject("طائرة")}>طائرة</Button>
+    </CardContent>
+  </Card>
+
+  {/* منطقة العمل (المشهد) */}
+  <Card className="col-span-2 h-[400px] relative bg-gray-100">
+    <CardContent>
+      {/* عرض جميع المجسمات داخل المشهد */}
+      {objects.map((obj) => (
+        <div
+          key={obj.id} // مفتاح React الفريد
+          onClick={() => setSelected(obj.id)} // عند الضغط نحدد المجسم
+          className={`absolute cursor-pointer p-2 rounded-xl shadow 
+            ${selected === obj.id ? "bg-yellow-300" : "bg-white"}`}
+          style={{ left: obj.x, top: obj.y }} // تحديد مكان المجسم
+        >
+          {/* اسم نوع المجسم */}
+          {obj.type}
+
+          {/* عرض الحركة الحالية */}
+          <div className="text-xs">{obj.action}</div>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+
+  {/* لوحة التحكم بالحركة */}
+  <Card className="col-span-1">
+    <CardContent className="space-y-3">
+      <h2 className="text-xl font-bold">🎬 الحركة</h2>
+
+      {/* لا تظهر أزرار الحركة إلا إذا تم تحديد مجسم */}
+      {selected && (
+        <>
+          <Button onClick={() => updateAction(selected, "يمشي يمين")}>
+            يمشي يمين
+          </Button>
+
+          <Button onClick={() => updateAction(selected, "يمشي يسار")}>
+            يمشي يسار
+          </Button>
+
+          <Button onClick={() => updateAction(selected, "يدخل")}>
+            يدخل
+          </Button>
+
+          <Button onClick={() => updateAction(selected, "يخرج")}>
+            يخرج
+          </Button>
+        </>
+      )}
+
+      {/* زر تشغيل المشهد (جاهز للتطوير لاحقًا) */}
+      <Button variant="outline" className="w-full">
+        <Play className="mr-2" /> تشغيل المشهد
+      </Button>
+    </CardContent>
+  </Card>
+</div>
+
+); }
+
